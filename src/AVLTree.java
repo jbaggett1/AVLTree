@@ -1,12 +1,22 @@
 /**
+ * Jillian Baggett and Arjun Manoj
  * Class AVLTree is a basic implementaion of Adelson-Velskii and
  * Landis' Balanced Binary Search Tree.
  */
 
-public class AVLTree<E extends Comparable<? super E>> {
-    protected Node root;
-    protected int size;
-   
+public class AVLTree <E extends Comparable<? super E>> {
+    private Node root;
+    private int size;
+
+    public static void main(String[] args)
+    {
+        AVLTree example = new AVLTree();
+        example.insert(7);
+        example.insert(3);
+        example.insert(6);
+        example.insert(5);
+    }
+
     public int getSize()
     { return this.size;
     }
@@ -15,18 +25,10 @@ public class AVLTree<E extends Comparable<? super E>> {
      */
     public AVLTree() {
         // not necessary, but explicit stating root starts at null
-        this.root = null; 
+        this.root = null;
         this.size = 0;
     }
-    public E getRoot()
-    { return this.root.element;
-    }
-    public Node getRight(Node n)
-    { return n.right;
-    } 
-    public E getLeft(Node n)
-    { return n.left.element;
-    }
+
     /**
      * Insert the element into this AVLTree.
      * @param element the element to insert into the tree. Duplicates are
@@ -36,21 +38,15 @@ public class AVLTree<E extends Comparable<? super E>> {
         this.root = insert(this.root, element);
         this.size++;
     }
-    
+
     /**
      * Remove the element from this AVLTree.
      * @param element the element to remove
      */
     public void remove(E element) {
-        
-         
-        
-        }
-        
-        
-        
- 
-   
+        this.root = remove(this.root, element);
+        this.size--;
+    }
 
     /**
      * Check if this tree contains the element.
@@ -64,7 +60,7 @@ public class AVLTree<E extends Comparable<? super E>> {
      * Return the minimum elemnent in this tree.
      * @return the mininum element in this tree
      */
-    public E findMin( ) {
+    public E findMin() {
         return findMin(this.root);
     }
 
@@ -76,7 +72,7 @@ public class AVLTree<E extends Comparable<? super E>> {
      * @param node the root of some subtree of this AVLTree
      * @param element the element to insert into this subtree
      */
-    protected Node insert(Node node, E element) {
+    private Node insert(Node node, E element) {
         if(node == null) {
             return new Node(element);
         }
@@ -98,15 +94,79 @@ public class AVLTree<E extends Comparable<? super E>> {
     }
 
     /*
-     * A private helper method for removal. 
+     * A private helper method for removal.
      * By taking a Node as a parameter, we can write this method
      * recursively, continuing to call remove on subtrees until the element
      * is removed.
      * @param node the root of some subtree of this AVLTree
      * @param element the element to remove from this subtree
      */
-    protected Node remove(Node node, E element) {
-        // STUBBED
+    private Node remove(Node node, E element) {
+
+        if (node == null){
+            return node;
+        }
+
+        if (element.compareTo(node.element) < 0){
+            node.left = remove(node.left, element);
+        }
+
+        else if (element.compareTo(node.element) > 0){
+            node.right = remove(node.right, element);
+        }
+
+        else
+        {
+            Node temp;
+
+            //One child or no child case
+            if (node.left == null || node.right == null) {
+
+                //set temporary node to left child
+                temp = node.left;
+
+                //if left child doesnt exist, check if the right one does
+                if (temp == null) {
+                    temp = node.right;
+                }
+
+                //no children exist, remove it
+                if (temp == null) {
+                    node = null;
+                }
+                else {
+                    node = temp;//copy that one child to node
+                }
+            }
+
+            else //nodes with two children
+            {
+
+                /*
+                LOGIC:When two children exist, take the next greatest element to the left subtree and
+                set that at the root of the node so the order and parent constraints are still maintained.
+                */
+
+                temp = node.right;
+
+                //find the smallest element on the right subtree
+                temp.element = findMin(node.right);
+
+                // copy element into current node
+                node.element = temp.element;
+
+                // Delete the smallest element on the right subtree
+                node.right = remove(node.right, temp.element);
+            }
+        }
+
+        //check if tree is balanced
+        if(Math.abs(height(node.left) - height(node.right)) > 1) {
+            node = balance(node);
+        }
+
+        // update height
+        node.height = Math.max(height(node.left), height(node.right)) + 1;
         return node;
     }
 
@@ -117,7 +177,7 @@ public class AVLTree<E extends Comparable<? super E>> {
      * @param node the root of the subtree to search in
      * @return true if this subtree contains the element, false otherwise
      */
-    protected boolean contains(Node node, E element) {
+    private boolean contains(Node node, E element) {
         if(node == null) {
             return false;
         }
@@ -137,12 +197,18 @@ public class AVLTree<E extends Comparable<? super E>> {
      * @return the minimum element in this subtree
      */
     private E findMin(Node node) {
-        // stubbed
-        return null;
+
+        //recursive loop till value is found
+        if (node.left == null){
+            return node.element;
+        }
+        else{
+            return findMin(node.left);
+        }
     }
 
     /*
-     * Balance the subtree rooted at this node. 
+     * Balance the subtree rooted at this node.
      * @param node the root of the subtree to balance
      * @return the new root of the balanced subtree
      */
@@ -154,34 +220,34 @@ public class AVLTree<E extends Comparable<? super E>> {
         int rightHeight = -1;
         int leftHeight = -1;
         if (node.right != null)
-          {  rightHeight = height(node.right);}
+        {  rightHeight = height(node.right);}
         if (node.left != null)
         { leftHeight = height(node.left);
         }
-        
-        //tree is imbalanced on right side 
-       if ((rightHeight - leftHeight) > 1)
-           { //found the lowest imbalance, must perform rotation
-               if ((rightHeight == 1) && (leftHeight == -1))
+
+        //tree is imbalanced on right side
+        if ((rightHeight - leftHeight) > 1)
+        { //found the lowest imbalance, must perform rotation
+            if ((rightHeight == 1) && (leftHeight == -1))
             { node = singleRotateWithRightChild(node);
-          
-            } 
+
+            }
             else //not to the lowest imbalance, move down the tree
             { node.right = balance(node.right);
-              rightHeight = height(node.right);
-              leftHeight = height(node.left);
+                rightHeight = height(node.right);
+                leftHeight = height(node.left);
             }
         }
         if ((leftHeight - rightHeight) > 1)
-       { 
-           if ((leftHeight == 1) && (rightHeight == -1))
-           { node = singleRotateWithLeftChild(node);
+        {
+            if ((leftHeight == 1) && (rightHeight == -1))
+            { node = singleRotateWithLeftChild(node);
             }
-           else //not to the lowest imbalance, move down the tree
+            else //not to the lowest imbalance, move down the tree
             { node.left = balance(node.left);
-              rightHeight = height(node.right);
-              leftHeight = height(node.left);
-            } 
+                rightHeight = height(node.right);
+                leftHeight = height(node.left);
+            }
         }
         return node;
     }
@@ -192,35 +258,34 @@ public class AVLTree<E extends Comparable<? super E>> {
      * @return the new root of this subtree
      */
     private Node singleRotateWithLeftChild(Node node) {
-        //STUBBED
         Node y = node.left;
         Node b = y.right;
-        
+
         //Rotate
         y.right = node;
         node.left = b;
-        
+
         //Update Heights
         if (node.right != null)
-       {
-           Node c = node.right;
-           c.height--;
-        } 
+        {
+            Node c = node.right;
+            c.height--;
+        }
         else
         { Node c = null;
         }
         node.height--;
         y.height++;
-        
-       if (y.left != null)
-       {
-           Node a = y.left;
-           a.height++;
-        } 
+
+        if (y.left != null)
+        {
+            Node a = y.left;
+            a.height++;
+        }
         else
         { Node a = null;
         }
-       
+
         //how to reduce/increase the height of all the nodes in each of the subtrees?
         return y;
     }
@@ -234,26 +299,26 @@ public class AVLTree<E extends Comparable<? super E>> {
         Node y = node.right;
         Node a = y.right;
         Node b = y.left;
-        
+
         //Rotate
         y.left = node;
         node.right = b;
-        
+
         //Update Heights
-       if (node.left != null)
-       {
-           Node c = node.left;
-           c.height--;
-        } 
+        if (node.left != null)
+        {
+            Node c = node.left;
+            c.height--;
+        }
         else
         { Node c = null;
         }
-        
+
         y.height++;
         a.height++;
         node.height--;
-        
-        
+
+
         return y;
     }
 
@@ -300,14 +365,14 @@ public class AVLTree<E extends Comparable<? super E>> {
         return Math.max(leftHeight, rightHeight) + 1;
     }
 
-    public class Node {
+    private class Node {
         // since this is a private inner class, and the outer AVLTree class
         // will need to freely modify the connections and update the height
         // of its nodes, the following three variables are not private.
         Node left;
         Node right;
         int height;
-        E element; 
+        E element;
 
         /**
          * Construct an AVLTreeNode. At instantiation, each node has no
@@ -322,4 +387,3 @@ public class AVLTree<E extends Comparable<? super E>> {
         }
     }
 }
-
