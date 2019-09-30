@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * Jillian Baggett and Arjun Manoj
  * Class AVLTree is a basic implementaion of Adelson-Velskii and
@@ -5,18 +7,18 @@
  */
 
 public class AVLTree <E extends Comparable<? super E>> {
-    private Node root;
-    private int size;
+    protected Node root;
+    protected int size;
 
-    public static void main(String[] args)
-    {
-        AVLTree example = new AVLTree();
-        example.insert(7);
-        example.insert(3);
-        example.insert(6);
-        example.insert(5);
-    }
-
+//    public static void main(String[] args)
+//    { 
+//    	AVLTree<Integer> example3 = new AVLTree<Integer>();
+//		example3.insert(5);
+//		example3.insert(7);
+//		example3.insert(6);
+//		example3.printTree();
+//		int ex3 = example3.root.element;
+//    }
     public int getSize()
     { return this.size;
     }
@@ -72,7 +74,7 @@ public class AVLTree <E extends Comparable<? super E>> {
      * @param node the root of some subtree of this AVLTree
      * @param element the element to insert into this subtree
      */
-    private Node insert(Node node, E element) {
+    protected Node insert(Node node, E element) {
         if(node == null) {
             return new Node(element);
         }
@@ -101,7 +103,7 @@ public class AVLTree <E extends Comparable<? super E>> {
      * @param node the root of some subtree of this AVLTree
      * @param element the element to remove from this subtree
      */
-    private Node remove(Node node, E element) {
+    protected Node remove(Node node, E element) {
 
         if (node == null){
             return node;
@@ -196,7 +198,7 @@ public class AVLTree <E extends Comparable<? super E>> {
      * @param node the root of the subtree
      * @return the minimum element in this subtree
      */
-    private E findMin(Node node) {
+    protected E findMin(Node node) {
 
         //recursive loop till value is found
         if (node.left == null){
@@ -212,42 +214,60 @@ public class AVLTree <E extends Comparable<? super E>> {
      * @param node the root of the subtree to balance
      * @return the new root of the balanced subtree
      */
-    private Node balance(Node node) {
+    protected Node balance(Node node) {
         // Determine which type of rotation should be used and call on it.
         // NOTE: Don't forget to update the heights of the nodes after you
         // manipulate the subtree. Implementor's perogative on best way to
         // maintain correct heights.
+    	Node answer;
         int rightHeight = -1;
         int leftHeight = -1;
+        int elementLessLeft = 0;
+        int elementLessRight = 0;
+        int elementLessRightLeft = 0;
+        int elementLessLeftRight = 0;
+        
         if (node.right != null)
         {  rightHeight = height(node.right);}
         if (node.left != null)
         { leftHeight = height(node.left);
         }
-
-        //tree is imbalanced on right side
-        if ((rightHeight - leftHeight) > 1)
-        { //found the lowest imbalance, must perform rotation
-            if ((rightHeight == 1) && (leftHeight == -1))
-            { node = singleRotateWithRightChild(node);
-
-            }
-            else //not to the lowest imbalance, move down the tree
-            { node.right = balance(node.right);
-                rightHeight = height(node.right);
-                leftHeight = height(node.left);
-            }
-        }
-        if ((leftHeight - rightHeight) > 1)
+        int heightDiff = leftHeight - rightHeight;
+        System.out.println(heightDiff);
+        
+        if (node.left != null)
         {
-            if ((leftHeight == 1) && (rightHeight == -1))
-            { node = singleRotateWithLeftChild(node);
-            }
-            else //not to the lowest imbalance, move down the tree
-            { node.left = balance(node.left);
-                rightHeight = height(node.right);
-                leftHeight = height(node.left);
-            }
+        elementLessLeft = node.element.compareTo(node.left.element);
+        System.out.println("Element left less: " + elementLessLeft);
+       
+        }
+        if (node.right != null)
+        {
+         elementLessRight = node.element.compareTo(node.right.element);
+         System.out.println("Element right less: " + elementLessRight);
+        }
+       
+        //tree is imbalanced on right side
+        if ((heightDiff > 1))
+        {  if (height(node.left.left) - height(node.left.right) > 0 )
+        	{   answer = singleRotateWithLeftChild(node);
+        		this.root.height = Math.max(height(root.left), height(root.right));
+        		return answer;
+        	}
+        	else
+        	{	
+        		return doubleRotateWithLeftChild(node);
+        	}
+        	
+        }
+        else if (heightDiff < -1 && node.right != null)
+        {
+        	if (height(node.right.right) - height(node.right.left)> 0 )
+        			{return singleRotateWithRightChild(node);}
+        	else
+        	{
+        		return doubleRotateWithRightChild(node);
+        	}
         }
         return node;
     }
@@ -257,15 +277,18 @@ public class AVLTree <E extends Comparable<? super E>> {
      * @param node the root of the subtree to rotate
      * @return the new root of this subtree
      */
-    private Node singleRotateWithLeftChild(Node node) {
-        Node y = node.left;
-        Node b = y.right;
+    protected Node singleRotateWithLeftChild(Node node) {
+    	System.out.println("Single left rotate hit");
+    	Node y = node.left;
+    	Node b = y.right;
 
         //Rotate
         y.right = node;
         node.left = b;
-
+   
         //Update Heights
+        node.height--;
+        y.height++; 
         if (node.right != null)
         {
             Node c = node.right;
@@ -274,9 +297,6 @@ public class AVLTree <E extends Comparable<? super E>> {
         else
         { Node c = null;
         }
-        node.height--;
-        y.height++;
-
         if (y.left != null)
         {
             Node a = y.left;
@@ -285,7 +305,6 @@ public class AVLTree <E extends Comparable<? super E>> {
         else
         { Node a = null;
         }
-
         //how to reduce/increase the height of all the nodes in each of the subtrees?
         return y;
     }
@@ -295,9 +314,11 @@ public class AVLTree <E extends Comparable<? super E>> {
      * @param node the root of the subtree to rotate
      * @return the new root of this subtree
      */
-    private Node singleRotateWithRightChild(Node node) {
+    protected Node singleRotateWithRightChild(Node node) {
+    	
+    	System.out.println("Single right rotate hit");
         Node y = node.right;
-        Node a = y.right;
+        //Node a = y.right;
         Node b = y.left;
 
         //Rotate
@@ -315,7 +336,15 @@ public class AVLTree <E extends Comparable<? super E>> {
         }
 
         y.height++;
-        a.height++;
+        
+        if (y.right != null)
+        {
+            Node a = y.right;
+            a.height++;
+        }
+        else
+        { Node a = null;
+        }
         node.height--;
 
 
@@ -327,8 +356,9 @@ public class AVLTree <E extends Comparable<? super E>> {
      * @param node the root of the subtree to rotate
      * @return the new root of this subtree
      */
-    private Node doubleRotateWithLeftChild(Node node) {
+    protected Node doubleRotateWithLeftChild(Node node) {
         //STUBBED
+    	System.out.println("Double Left Rotate hit");
         node.left = singleRotateWithRightChild(node.left);
         Node newRoot = singleRotateWithLeftChild(node);
         return newRoot;
@@ -339,7 +369,8 @@ public class AVLTree <E extends Comparable<? super E>> {
      * @param node the root of the subtree to rotate
      * @return the new root of this subtree
      */
-    private Node doubleRotateWithRightChild(Node node) {
+    protected Node doubleRotateWithRightChild(Node node) {
+    	System.out.println("Double right rotate hit");
         node.right = singleRotateWithLeftChild(node.right);
         Node newRoot = singleRotateWithRightChild(node);
         return newRoot;
@@ -353,7 +384,7 @@ public class AVLTree <E extends Comparable<? super E>> {
      * @param node the node to calculate the height of
      * @return its height as determined by the heights of its subtrees
      */
-    private int height(Node node) {
+    protected int height(Node node) {
         // if the left child is null, its height is -1, otherwise, retrieve
         // its height
         if (node == null)
@@ -364,8 +395,33 @@ public class AVLTree <E extends Comparable<? super E>> {
         int rightHeight = (node.right == null ? -1 : node.right.height);
         return Math.max(leftHeight, rightHeight) + 1;
     }
+    protected ArrayList<Integer> printTree()
+    {   ArrayList<Integer> treeString = null;
+    	int h = height(this.root);
+    	System.out.print("Height is: " + h );
+    	for (int i = 1; i <= h; i++)
+    		treeString = printFullLevel(root, i, treeString);
+    	return treeString;
+    }
+    protected ArrayList<Integer> printFullLevel(Node root, int level, ArrayList<Integer> tree)
+    {
+    	if (root == null)
+    		return tree;
+    	if (level == 1)
+    		
+    		{ 
+    		   tree.add(Integer.castInt(root.element));
+    		System.out.print(root.element + " ");
+    		}
+    	else if (level > 1)
+    	{
+    		printFullLevel(root.left, level-1, tree);
+    		printFullLevel(root.right, level-1, tree);
+    	}
+    	return tree;
+    }
 
-    private class Node {
+    protected class Node {
         // since this is a private inner class, and the outer AVLTree class
         // will need to freely modify the connections and update the height
         // of its nodes, the following three variables are not private.
