@@ -10,15 +10,16 @@ public class AVLTree <E extends Comparable<? super E>> {
     protected Node root;
     protected int size;
 
-//    public static void main(String[] args)
-//    { 
-//    	AVLTree<Integer> example3 = new AVLTree<Integer>();
-//		example3.insert(5);
-//		example3.insert(7);
-//		example3.insert(6);
-//		example3.printTree();
-//		int ex3 = example3.root.element;
-//    }
+    public static void main(String[] args)
+    { 
+    	AVLTree<Integer> example3 = new AVLTree<Integer>();
+		example3.insert(1);
+		example3.insert(2);
+		example3.insert(3);
+		example3.remove(2);
+		String tree = example3.printTree().toString();
+		System.out.println("\n" + tree + "\n");
+    }
     public int getSize()
     { return this.size;
     }
@@ -135,9 +136,11 @@ public class AVLTree <E extends Comparable<? super E>> {
                 //no children exist, remove it
                 if (temp == null) {
                     node = null;
+                    return node;
                 }
                 else {
-                    node = temp;//copy that one child to node
+                    node = temp;
+                    return node;//copy that one child to node
                 }
             }
 
@@ -163,10 +166,15 @@ public class AVLTree <E extends Comparable<? super E>> {
         }
 
         //check if tree is balanced
-        if(Math.abs(height(node.left) - height(node.right)) > 1) {
+//        System.out.println("Node.left is: " + node.left.element.toString());
+//        System.out.println("Node.right is: " + node.right.element.toString());
+//        System.out.println("Node is: "+ node.element.toString());
+
+            
+        if ( Math.abs(height(node.left) - height(node.right)) > 1) {
             node = balance(node);
         }
-
+    
         // update height
         node.height = Math.max(height(node.left), height(node.right)) + 1;
         return node;
