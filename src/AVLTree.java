@@ -396,29 +396,32 @@ public class AVLTree <E extends Comparable<? super E>> {
         return Math.max(leftHeight, rightHeight) + 1;
     }
     protected ArrayList<Integer> printTree()
-    {   ArrayList<Integer> treeString = null;
-    	int h = height(this.root);
-    	System.out.print("Height is: " + h );
-    	for (int i = 1; i <= h; i++)
-    		treeString = printFullLevel(root, i, treeString);
-    	return treeString;
+    {   
+        ArrayList<Integer> treeString = new ArrayList<Integer>();
+        int h = height(this.root);
+        //System.out.print("Height is: " + h );
+        for (int i = 0; i <= h; i++)
+             printFullLevel(root, i, treeString);
+        
+        return treeString;
     }
-    protected ArrayList<Integer> printFullLevel(Node root, int level, ArrayList<Integer> tree)
+    protected ArrayList<Integer> printFullLevel(Node root, int level, ArrayList<Integer> treeString)
     {
-    	if (root == null)
-    		return tree;
-    	if (level == 1)
-    		
-    		{ 
-    		   tree.add(Integer.castInt(root.element));
-    		System.out.print(root.element + " ");
-    		}
-    	else if (level > 1)
-    	{
-    		printFullLevel(root.left, level-1, tree);
-    		printFullLevel(root.right, level-1, tree);
-    	}
-    	return tree;
+        if (root == null)
+            return treeString;
+        if (level == 0)
+            
+            { 
+            treeString.add(Integer.parseInt(root.element.toString()));
+             
+            System.out.print(root.element + " ");
+            }
+        else if (level >= 1)
+        {
+            printFullLevel(root.left, level-1, treeString);
+            printFullLevel(root.right, level-1, treeString);
+        }
+        return treeString;
     }
 
     protected class Node {

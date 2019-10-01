@@ -35,41 +35,39 @@ public class AVLTreeTest {
 
 	@Test
 	public void testInsertE() {
-		//Test single left rotation
+	    //Test single left rotation  
 		example.insert(3);
-		example.insert(2);
-		example.insert(1);
-		int ex1 = example.root.element;
-		System.out.println();
-		//example.printTree();
-		assertEquals(2,ex1);
+	    example.insert(2);
+	    example.insert(1);
+	    String testAns = example.printTree().toString();
+	    String ans1 = "[2, 1, 3]";
+	    assertEquals(ans1,testAns);
 		
 
 		//Test single right rotation
 		example2.insert(3);
 		example2.insert(4);
 		example2.insert(5);
-		int ex2 = example2.root.element;
-		//example2.printTree();
-		assertEquals(4, ex2);
+		String testAns2 = example2.printTree().toString();
+		String ans2 = "[4, 3, 5]";
+		assertEquals(ans2,testAns2);
 		
 		//Test double right (inner) rotation
 		example3.insert(5);
 		example3.insert(7);
     	example3.insert(6);
-		//example3.printTree();
-		int ex3 = example3.root.element;
-		assertEquals(6, ex3);
+    	String testAns3 = example3.printTree().toString();
+    	String ans3 = "[6, 5, 7]";
+		assertEquals(ans3, testAns3);
 		
 		
 		//Test double left rotation
 		example4.insert(5);
 		example4.insert(3);
 		example4.insert(4);
-		ArrayList<Integer> ex4sample = example4.printTree();
-		int ex4 = example4.root.element;
-		List<Integer> x = new ArrayList<>(Arrays.asList(4,3,5));
-		assertEquals(x, ex4sample);
+    	String testAns4 = example4.printTree().toString();
+    	String ans4 = "[4, 3, 5]";
+		assertEquals(ans4, testAns4);
 	}
 
 	@Test
