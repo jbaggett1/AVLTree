@@ -33,8 +33,16 @@ public class AVLTreeTest {
 		assertEquals(2, example.getSize());
 	}
 
+    /**
+     * One note - due to the fact that my 'printTree' method (which actually returns an 
+     * integer ArrayList, invokes the height at every level in order to iterate through the
+     * tree from left to right, the order given in the list is therefore the same as we
+     * discussed in class and leaves a unique fingerprint for the structure of the tree, so 
+     * multiple different traversals are not necessary to call. 
+     */
 	@Test
 	public void testInsertE() {
+		
 	    //Test single left rotation  
 		example.insert(3);
 	    example.insert(2);
@@ -131,9 +139,7 @@ public class AVLTreeTest {
 		example2.insert(4);
 		example2.insert(5);
 		assertEquals("3", example2.findMin().toString());
-	
-		
-	    
+	  
 	}
 
 }
